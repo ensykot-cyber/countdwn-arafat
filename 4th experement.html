@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown to December 12</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .description {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .timer-display {
+            width: 100%;
+            background: #111;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 2rem 0;
+            padding: 40px 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff5252, #ffeb3b, #4caf50);
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            gap: 1rem;
+        }
+
+        .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .time-label {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffeb3b;
+        }
+
+        .digit-group {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .flip-card {
+            width: 90px;
+            height: 110px;
+            perspective: 1000px;
+            flex-shrink: 0;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipping .flip-card-inner {
+            transform: rotateX(-180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.8rem;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .flip-card-front {
+            background: #222;
+            color: #ff5252;
+            text-shadow: 0 0 10px rgba(255, 82, 82, 0.7);
+            border: 1px solid #333;
+        }
+
+        .flip-card-back {
+            background: #222;
+            color: #ff5252;
+            transform: rotateX(180deg);
+            text-shadow: 0 0 10px rgba(255, 82, 82, 0.7);
+            border: 1px solid #333;
+        }
+
+        .separator {
+            font-size: 3.5rem;
+            color: #ff5252;
+            align-self: center;
+            margin: 0 0.2rem;
+            text-shadow: 0 0 10px rgba(255, 82, 82, 0.7);
+            padding-bottom: 1.5rem;
+        }
+
+        .message {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            min-height: 2rem;
+            color: #ffeb3b;
+            text-shadow: 0 0 10px rgba(255, 235, 59, 0.7);
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            height: 12px;
+            background: #333;
+            border-radius: 6px;
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b, #ff5252);
+            border-radius: 6px;
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        @media (max-width: 900px) {
+            .timer-container {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1.5rem;
+            }
+            
+            .time-block {
+                flex: 0 0 calc(50% - 1rem);
+            }
+            
+            .separator {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .flip-card {
+                width: 70px;
+                height: 90px;
+            }
+            
+            .flip-card-front, .flip-card-back {
+                font-size: 3rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .separator {
+                font-size: 2.5rem;
+            }
+            
+            .time-block {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>বাল পড় পরীক্ষা।প্রেমিকার বিয়ে ঠেকাতে হবে।মানুষকে জবাব দিতে হবে।</h1>
+        <p class="description"></p>
+        
+        <div class="timer-display">
+            <div class="timer-container">
+                <div class="time-block">
+                    <div class="time-label">Days</div>
+                    <div class="digit-group">
+                        <div class="flip-card" id="days-tens">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                        <div class="flip-card" id="days-ones">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="separator">:</div>
+                
+                <div class="time-block">
+                    <div class="time-label">Hours</div>
+                    <div class="digit-group">
+                        <div class="flip-card" id="hours-tens">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                        <div class="flip-card" id="hours-ones">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="separator">:</div>
+                
+                <div class="time-block">
+                    <div class="time-label">Minutes</div>
+                    <div class="digit-group">
+                        <div class="flip-card" id="minutes-tens">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                        <div class="flip-card" id="minutes-ones">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="separator">:</div>
+                
+                <div class="time-block">
+                    <div class="time-label">Seconds</div>
+                    <div class="digit-group">
+                        <div class="flip-card" id="seconds-tens">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                        <div class="flip-card" id="seconds-ones">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">0</div>
+                                <div class="flip-card-back">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+        
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const daysTens = document.getElementById('days-tens');
+            const daysOnes = document.getElementById('days-ones');
+            const hoursTens = document.getElementById('hours-tens');
+            const hoursOnes = document.getElementById('hours-ones');
+            const minutesTens = document.getElementById('minutes-tens');
+            const minutesOnes = document.getElementById('minutes-ones');
+            const secondsTens = document.getElementById('seconds-tens');
+            const secondsOnes = document.getElementById('seconds-ones');
+            const messageEl = document.getElementById('message');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // Set target date to December 12, 10:00 AM of current year
+            const currentYear = new Date().getFullYear();
+            const targetDate = new Date(currentYear, 11, 12, 8, 0, 0); // Month is 0-indexed (11 = December)
+            
+            // If we've already passed December 12 this year, set target to next year
+            if (new Date() > targetDate) {
+                targetDate.setFullYear(currentYear + 1);
+            }
+            
+            // Calculate initial time remaining
+            let totalSeconds = Math.floor((targetDate - new Date()) / 1000);
+            const initialSeconds = totalSeconds;
+            
+            // Start countdown automatically
+            startCountdown();
+            
+            // Start the countdown
+            function startCountdown() {
+                const countdownInterval = setInterval(function() {
+                    totalSeconds = Math.floor((targetDate - new Date()) / 1000);
+                    
+                    if (totalSeconds <= 0) {
+                        completeCountdown();
+                        clearInterval(countdownInterval);
+                        return;
+                    }
+                    
+                    updateDisplay();
+                    updateProgressBar();
+                    
+                    // Animate the seconds ones digit on every tick
+                    animateFlip(secondsOnes, getDigit(totalSeconds % 60, 1));
+                    
+                    // Animate other digits when they change
+                    if (totalSeconds % 60 === 59) {
+                        animateFlip(secondsTens, getDigit(totalSeconds % 60, 0));
+                        animateFlip(minutesOnes, getDigit(Math.floor(totalSeconds / 60) % 60, 1));
+                    }
+                    
+                    if (totalSeconds % 3600 === 3599) {
+                        animateFlip(minutesTens, getDigit(Math.floor(totalSeconds / 60) % 60, 0));
+                        animateFlip(hoursOnes, getDigit(Math.floor((totalSeconds % 86400) / 3600), 1));
+                    }
+                    
+                    if (totalSeconds % 86400 === 86399) {
+                        animateFlip(hoursTens, getDigit(Math.floor((totalSeconds % 86400) / 3600), 0));
+                        animateFlip(daysOnes, getDigit(Math.floor(totalSeconds / 86400), 1));
+                    }
+                    
+                    if (totalSeconds % 864000 === 863999) {
+                        animateFlip(daysTens, getDigit(Math.floor(totalSeconds / 86400), 0));
+                    }
+                }, 1000);
+            }
+            
+            // Complete the countdown
+            function completeCountdown() {
+                messageEl.textContent = "Time's up! It's December 12, 10:00 AM!";
+                
+                // Flash animation
+                flashDisplay();
+                
+                // Play completion sound (simulated with a beep)
+                playBeep();
+            }
+            
+            // Update the display with current time
+            function updateDisplay() {
+                const days = Math.floor(totalSeconds / 86400);
+                const hours = Math.floor((totalSeconds % 86400) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                updateDigit(daysTens, getDigit(days, 0));
+                updateDigit(daysOnes, getDigit(days, 1));
+                updateDigit(hoursTens, getDigit(hours, 0));
+                updateDigit(hoursOnes, getDigit(hours, 1));
+                updateDigit(minutesTens, getDigit(minutes, 0));
+                updateDigit(minutesOnes, getDigit(minutes, 1));
+                updateDigit(secondsTens, getDigit(seconds, 0));
+                updateDigit(secondsOnes, getDigit(seconds, 1));
+            }
+            
+            // Update progress bar
+            function updateProgressBar() {
+                const progress = ((initialSeconds - totalSeconds) / initialSeconds) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+            
+            // Get specific digit from a number (0 for tens, 1 for ones)
+            function getDigit(number, position) {
+                const digits = number.toString().padStart(2, '0').split('');
+                return parseInt(digits[position]);
+            }
+            
+            // Update a digit without animation
+            function updateDigit(flipCard, newDigit) {
+                const front = flipCard.querySelector('.flip-card-front');
+                const back = flipCard.querySelector('.flip-card-back');
+                
+                front.textContent = newDigit;
+                back.textContent = newDigit;
+            }
+            
+            // Animate a flip card
+            function animateFlip(flipCard, newDigit) {
+                const front = flipCard.querySelector('.flip-card-front');
+                const back = flipCard.querySelector('.flip-card-back');
+                
+                // Set the new digit on the back face
+                back.textContent = newDigit;
+                
+                // Add flipping class to trigger animation
+                flipCard.classList.add('flipping');
+                
+                // After animation completes, update the front and remove flipping class
+                setTimeout(() => {
+                    front.textContent = newDigit;
+                    flipCard.classList.remove('flipping');
+                }, 600);
+            }
+            
+            // Flash the display when countdown completes
+            function flashDisplay() {
+                const flipCards = document.querySelectorAll('.flip-card');
+                let flashCount = 0;
+                const flashInterval = setInterval(() => {
+                    flipCards.forEach(card => {
+                        card.style.visibility = card.style.visibility === 'hidden' ? 'visible' : 'hidden';
+                    });
+                    
+                    flashCount++;
+                    if (flashCount >= 6) {
+                        clearInterval(flashInterval);
+                        flipCards.forEach(card => {
+                            card.style.visibility = 'visible';
+                        });
+                    }
+                }, 500);
+            }
+            
+            // Play a beep sound (simulated)
+            function playBeep() {
+                // In a real application, you would play an actual sound file
+                // This is a simulation using the Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 1);
+                } catch (e) {
+                    console.log("Web Audio API not supported");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
